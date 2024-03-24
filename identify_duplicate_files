@@ -1,0 +1,36 @@
+Credit: https://stackoverflow.com/questions/78214683/identify-duplicates-files-in-folder-and-subfolder/78214840#78214840
+
+import os
+import hashlib
+from collections import defaultdict
+
+def file_hash(filepath):
+    hasher = hashlib.sha256()
+    with open(filepath, "rb") as f:
+        for chunk in iter(lambda: f.read(4096), b""):
+            hasher.update(chunk)
+    return hasher.hexdigest()
+
+
+def find_duplicate_files(directory):
+    duplicates = defaultdict(list)
+    for root, _, files in os.walk(directory):
+        for file in files:
+            if file.lower().endswith(".pdf"):
+                file_path = os.path.join(root, file)
+                file_checksum = file_hash(file_path)
+                duplicates[file_checksum].append(file_path)
+    return {k: v for k, v in duplicates.items() if len(v) > 1}
+
+
+directory = "E:/username/Desktop/folder" 
+duplicate_files = find_duplicate_files(directory)
+
+if duplicate_files:
+    print("duplicate files found:")
+    for hash_value, files in duplicate_files.items():
+        print(f"hash: {hash_value}")
+        for file_path in files:
+            print(f"- {file_path}")
+else:
+    print("no duplicate files found")
