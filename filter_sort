@@ -1,0 +1,54 @@
+def filter_sort(property_type_order
+                , property_tenure_order
+                , filtered_s_property_bm_df
+                , filtered_s_input_from_rm_df):
+    
+    filtered_df = filtered_s_property_bm_df[filtered_s_property_bm_df['standardised_property_type'].isin(property_type_order)].copy()
+    
+    filtered_df['built_year_dif'] = abs(filtered_df['built_year'] - filtered_s_input_from_rm_df['built_year'].iloc[0])
+
+    filtered_df['standardised_property_type'] = pd.Categorical(filtered_df['standardised_property_type'], 
+                                                              categories=property_type_order, ordered=True)
+
+    sorted_df = filtered_df.sort_values(by='standardised_property_type', 
+                                        key=lambda x: pd.Categorical(x, categories=property_type_order))
+
+    sorted_df = sorted_df.groupby(['standardised_property_type', 'standardised_property_tenure']).apply(lambda x: 
+                    x.sort_values(by=['built_year_dif'])).reset_index(drop=True)
+
+
+    return sorted_df
+
+
+res_input_from_rm_df = pd.DataFrame()
+
+for i in range(len(s_input_from_rm_df)):
+    
+    property_id = s_input_from_rm_df.loc[i, 'property_id']
+    filtered_s_property_bm_df = s_property_bm_df[s_property_bm_df['property_id'] == property_id]
+    filtered_s_input_from_rm_df = s_input_from_rm_df[s_input_from_rm_df['property_id'] == property_id]
+
+    if (filtered_s_input_from_rm_df['standardised_property_type'].iloc[0] == 'Semi-detached house') and \
+       (filtered_s_input_from_rm_df['standardised_property_tenure'].iloc[0] == '99-year Leasehold'):
+        
+        property_type_order = ['Semi-detached house', 'Landed house', 'NaN']
+        property_tenure_order = ['99-year Leasehold', '999-year Leasehold', 'Freehold', 'NaN']
+        
+        res_input_from_rm_df = pd.concat([res_input_from_rm_df, filter_sort(property_type_order
+                                                                            , property_tenure_order
+                                                                            , filtered_s_property_bm_df
+                                                                            , filtered_s_input_from_rm_df)])
+    
+    elif (filtered_s_input_from_rm_df['standardised_property_type'].iloc[0] == 'Landed house') and \
+         (filtered_s_input_from_rm_df['standardised_property_tenure'].iloc[0] == '99-year Leasehold'):
+        
+        property_type_order = ['Bungalow','Semi-detached house', 'Terraced house', 'Landed house', 'NaN']
+        property_tenure_order = ['99-year Leasehold', '999-year Leasehold', 'Freehold', 'NaN']
+        
+        res_input_from_rm_df = pd.concat([res_input_from_rm_df, filter_sort(property_type_order
+                                                                            , property_tenure_order
+                                                                            , filtered_s_property_bm_df
+                                                                            , filtered_s_input_from_rm_df)])
+        
+res_input_from_rm_df.drop(columns=['built_year_dif'], inplace=True)
+res_input_from_rm_df
