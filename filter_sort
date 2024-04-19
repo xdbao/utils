@@ -1,43 +1,24 @@
- import requests
-import json
+import os
+import shutil
 
-# Set your CDSW credentials and project details
-cdsw_domain = 'your_cdsw_domain'
-api_key = 'your_api_key'
-source_project_name = 'source_project_name'
-source_folder_path = '/path/to/source/folder'
-destination_project_name = 'destination_project_name'
-destination_folder_path = '/path/to/destination/folder'
+def copy_folder_structure(source_dir, destination_dir):
+    for root, dirs, files in os.walk(source_dir):
+        # Create corresponding directories in the destination folder
+        for directory in dirs:
+            source_path = os.path.join(root, directory)
+            relative_path = os.path.relpath(source_path, source_dir)
+            destination_path = os.path.join(destination_dir, relative_path)
+            os.makedirs(destination_path, exist_ok=True)
 
-# Define CDSW API endpoints
-base_url = f"https://{cdsw_domain}/api/v1"
-projects_url = f"{base_url}/projects"
+        # Copy files to the destination folder
+        for file in files:
+            source_path = os.path.join(root, file)
+            relative_path = os.path.relpath(source_path, source_dir)
+            destination_path = os.path.join(destination_dir, relative_path)
+            shutil.copyfile(source_path, destination_path)
 
-# Get source project ID
-headers = {
-    "Content-Type": "application/json",
-    "Authorization": f"Bearer {api_key}"
-}
-response = requests.get(projects_url, headers=headers)
-projects = response.json()
-source_project_id = next((p["id"] for p in projects if p["name"] == source_project_name), None)
+# Example usage:
+source_dir = '/path/to/source/folder'
+destination_dir = '/path/to/destination/folder'
 
-# Get destination project ID
-destination_project_id = next((p["id"] for p in projects if p["name"] == destination_project_name), None)
-
-# List files in source folder
-files_url = f"{projects_url}/{source_project_id}/files"
-response = requests.get(files_url, headers=headers)
-source_files = response.json()
-
-# Copy files to destination project
-for file_info in source_files:
-    file_path = file_info["path"]
-    file_content_url = f"{files_url}/{file_path}"
-    response = requests.get(file_content_url, headers=headers)
-    file_content = response.content
-    
-    # Upload files to destination project
-    destination_file_path = file_path.replace(source_folder_path, destination_folder_path, 1)
-    upload_url = f"{projects_url}/{destination_project_id}/files/{destination_file_path}"
-    response = requests.post(upload_url, headers=headers, data=file_content)
+copy_folder_structure(source_dir, destination_dir)
