@@ -5,6 +5,8 @@ def copy_folder_structure(source_dir, destination_dir):
     for root, dirs, files in os.walk(source_dir):
         # Create corresponding directories in the destination folder
         for directory in dirs:
+            if directory == "vector":
+                continue  # Skip directories named "vector"
             source_path = os.path.join(root, directory)
             relative_path = os.path.relpath(source_path, source_dir)
             destination_path = os.path.join(destination_dir, relative_path)
@@ -12,6 +14,8 @@ def copy_folder_structure(source_dir, destination_dir):
 
         # Copy files to the destination folder
         for file in files:
+            if file.endswith('.ipynb'):
+                continue  # Skip .ipynb files
             source_path = os.path.join(root, file)
             relative_path = os.path.relpath(source_path, source_dir)
             destination_path = os.path.join(destination_dir, relative_path)
