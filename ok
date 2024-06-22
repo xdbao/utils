@@ -1,0 +1,27 @@
+import csv
+
+def txt_to_csv(txt_file_path, csv_file_path):
+    try:
+        with open(txt_file_path, 'r', encoding='utf-8') as txt_file:
+            # Read the content of the text file
+            lines = txt_file.readlines()
+    except UnicodeDecodeError:
+        with open(txt_file_path, 'r', encoding='ISO-8859-1') as txt_file:
+            # Read the content of the text file
+            lines = txt_file.readlines()
+
+    with open(csv_file_path, 'w', newline='', encoding='utf-8') as csv_file:
+        csv_writer = csv.writer(csv_file)
+
+        for line in lines:
+            # Strip any leading/trailing whitespace and split by commas
+            row = line.strip().split(',')
+            # Write the row to the CSV file
+            csv_writer.writerow(row)
+
+# Example usage
+txt_file_path = 'data.txt'  # Replace with your input txt file path
+csv_file_path = 'output.csv'  # Replace with your desired output csv file path
+txt_to_csv(txt_file_path, csv_file_path)
+
+print(f"Data has been converted from {txt_file_path} to {csv_file_path}.")
