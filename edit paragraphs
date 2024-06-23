@@ -1,0 +1,38 @@
+import pandas as pd
+import re
+
+def insert_newlines(input_string):
+    # Case 1: Insert newline between a letter and a number
+    input_string = re.sub(r'([a-zA-Z])([0-9])', r'\1\n\2', input_string)
+    
+    # Case 2: Insert newline between lowercase and uppercase letters
+    input_string = re.sub(r'([a-z])([A-Z])', r'\1\n\2', input_string)
+    
+    # Case 3: Insert newline before semicolon if no space in between
+    input_string = re.sub(r'([^ ])(;)', r'\1\n\2', input_string)
+    
+    # Case 4: Insert newline before hyphen if no space in between
+    input_string = re.sub(r'([^ ])(-)', r'\1\n\2', input_string)
+    
+    # Case 5: Insert newline before special character if no space in between
+    input_string = re.sub(r'([^ ])([•])', r'\1\n\2', input_string)
+
+    return input_string
+
+# Example DataFrame
+data = {
+    'column_name': [
+        "G1.01",
+        "GoNasdaq",
+        "Gomeow;meow",
+        "Hello;-hehe-bla",
+        "Insane•blabla•cute"
+    ]
+}
+df = pd.DataFrame(data)
+
+# Apply insert_newlines function to each cell in the column
+df['column_name'] = df['column_name'].apply(insert_newlines)
+
+# Print the modified DataFrame
+print(df)
