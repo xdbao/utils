@@ -8,14 +8,15 @@ def insert_newlines(input_string):
     # Case 2: Insert newline between lowercase and uppercase letters
     input_string = re.sub(r'([a-z])([A-Z])', r'\1\n\2', input_string)
     
-    # Case 3: Insert newline before semicolon if no space in between
-    input_string = re.sub(r'([^ ])(;)', r'\1\n\2', input_string)
+    # Case 3: Insert newline after semicolon only if not followed by a space and any word
+    input_string = re.sub(r';(?! )', r';\n', input_string)
     
     # Case 4: Insert newline before hyphen if no space in between
     input_string = re.sub(r'([^ ])(-)', r'\1\n\2', input_string)
     
-    # Case 5: Insert newline before special character if no space in between
+    # Case 5: Insert newline before and after special character if no space in between
     input_string = re.sub(r'([^ ])([•])', r'\1\n\2', input_string)
+    input_string = re.sub(r'([•])([^ \n])', r'\1\n\2', input_string)
 
     return input_string
 
@@ -26,7 +27,8 @@ data = {
         "GoNasdaq",
         "Gomeow;meow",
         "Hello;-hehe-bla",
-        "Insane•blabla•cute"
+        "Insane•blabla•cute",
+        "Example; test"
     ]
 }
 df = pd.DataFrame(data)
