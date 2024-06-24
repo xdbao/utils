@@ -20,6 +20,17 @@ def insert_newlines(input_string):
 
     return input_string
 
+
+def insert_new_lines(text):
+    # Define a regex pattern to match list items
+    pattern = r'(?<!^)\s*(?=(?:\(\s*(?:[ivxlcdm]+|[a-zA-Z])\s*\)))'
+    
+    # Replace matches with a newline followed by the match
+    updated_text = re.sub(pattern, r'\n', text)
+    
+    return updated_text
+
+
 # Example DataFrame
 data = {
     'column_name': [
