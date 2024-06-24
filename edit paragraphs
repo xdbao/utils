@@ -30,6 +30,30 @@ def insert_new_lines(text):
     
     return updated_text
 
+import re
+
+def insert_new_lines_before_hyphen_with_space(text):
+    # Define a regex pattern to match hyphens with a leading space and a trailing space
+    pattern = r'(?<=\s)-(?=\s)'
+    
+    # Replace matches with a newline followed by the hyphen
+    updated_text = re.sub(pattern, r'\n-', text)
+    
+    return updated_text
+
+# Example text
+text = """
+This is a test document.
+Some text - with a hyphen.
+More text - another hyphen.
+Hyphen-no-space.
+"""
+
+# Insert new lines before hyphens with a leading space and trailing space
+new_text = insert_new_lines_before_hyphen_with_space(text)
+
+print(new_text)
+
 
 
 
