@@ -1,0 +1,51 @@
+import re
+from docx import Document
+
+def read_lines_to_dict(file_a_path, file_b_path):
+    with open(file_a_path, 'r') as file_a, open(file_b_path, 'r') as file_b:
+        old_vars = file_a.read().splitlines()
+        new_vars = file_b.read().splitlines()
+    
+    if len(old_vars) != len(new_vars):
+        raise ValueError("Files A and B must have the same number of lines.")
+    
+    return dict(zip(old_vars, new_vars))
+
+def replace_variables_in_docx(file_c_path, replacements, output_path):
+    doc = Document(file_c_path)
+    
+    variable_pattern = re.compile(r'\{\{(\w+)\}\}')
+    
+    def replace_text(text):
+        matches = variable_pattern.findall(text)
+        for match in matches:
+            old_var = f"{{{{{match}}}}}"
+            new_var = replacements.get(match, "None")
+            text = text.replace(old_var, new_var)
+        return text
+    
+    for paragraph in doc.paragraphs:
+        if variable_pattern.search(paragraph.text):
+            paragraph.text = replace_text(paragraph.text)
+    
+    for table in doc.tables:
+        for row in table.rows:
+            for cell in row.cells:
+                if variable_pattern.search(cell.text):
+                    cell.text = replace_text(cell.text)
+    
+    doc.save(output_path)
+
+# Define file paths
+file_a_path = 'file_a.txt'
+file_b_path = 'file_b.txt'
+file_c_path = 'file_c.docx'
+output_path = 'output.docx'
+
+# Read files and create replacements dictionary
+replacements = read_lines_to_dict(file_a_path, file_b_path)
+
+# Replace variables in file_c and save to output file
+replace_variables_in_docx(file_c_path, replacements, output_path)
+
+print("Replacement completed successfully.")
