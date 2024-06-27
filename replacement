@@ -1,0 +1,33 @@
+def read_lines_to_dict(file_a_path, file_b_path):
+    with open(file_a_path, 'r') as file_a, open(file_b_path, 'r') as file_b:
+        old_vars = file_a.read().splitlines()
+        new_vars = file_b.read().splitlines()
+    
+    if len(old_vars) != len(new_vars):
+        raise ValueError("Files A and B must have the same number of lines.")
+    
+    return dict(zip(old_vars, new_vars))
+
+def replace_variables_in_text(file_c_path, replacements, output_path):
+    with open(file_c_path, 'r') as file_c:
+        content = file_c.read()
+    
+    for old_var, new_var in replacements.items():
+        content = content.replace(old_var, new_var)
+    
+    with open(output_path, 'w') as output_file:
+        output_file.write(content)
+
+# Define file paths
+file_a_path = 'file_a.txt'
+file_b_path = 'file_b.txt'
+file_c_path = 'file_c.txt'
+output_path = 'output.txt'
+
+# Read files and create replacements dictionary
+replacements = read_lines_to_dict(file_a_path, file_b_path)
+
+# Replace variables in file_c and save to output file
+replace_variables_in_text(file_c_path, replacements, output_path)
+
+print("Replacement completed successfully.")
